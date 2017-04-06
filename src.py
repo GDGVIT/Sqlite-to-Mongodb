@@ -72,7 +72,7 @@ class MONGO(SQL):
 
     def new_collection(self, table, data):
         coll = self.ns_db[table]
-        coll.bulk.insert(data)
+        coll.insert(data)
 
     def reading_tables(self):
         row = []
@@ -95,4 +95,4 @@ class ORDER_EXECUTION(MONGO):
 if __name__ == '__main__':
     obj = ORDER_EXECUTION()
     obj.execute()
-    print('done importing')
+    print('Done importing')
