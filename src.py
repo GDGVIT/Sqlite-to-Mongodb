@@ -3,6 +3,7 @@ import sqlite3
 import os
 import re
 import sys
+import pymongo
 
 
 class JSON():
@@ -12,7 +13,8 @@ class JSON():
 
     def dumping(self, var1):
         var1 = self.dictionary(var1)
-        return json.dumps(var1)
+        # return json.dumps(var1)
+        return var1
 
 
 class SQL(JSON):
@@ -50,27 +52,47 @@ class SQL(JSON):
 
     def listing_tables(self):
         self.table_list = self.db.execute('''
-			SELECT name FROM sqlite_master WHERE type = 'table'; 
+			SELECT name FROM sqlite_master WHERE type = 'table';
 			''').fetchall()
         self.table_list = [i[0] for i in self.table_list]
         self.table_list = [i for i in self.table_list if i not in ('sqlite_sequence', 'sqlite_stat1')]
+
+
+class MONGO(SQL):
+    client = ''
+    ns_db = ''
+
+    def prerequesites(self):
+        # try:
+        #      os.system('mongod')
+        # except Exception as e:
+        #    print('Make sure you have installed Mongo db')
+        self.client = pymongo.MongoClient()
+        self.ns_db = self.client[self.name_db[:-3]]
+
+    def new_collection(self, table, data):
+        coll = self.ns_db[table]
+        coll.bulk.insert(data)
 
     def reading_tables(self):
         row = []
         for i in self.table_list:
             row += (self.conn.execute('SELECT * FROM {}'.format(i))).fetchall()
-        self.data = self.dumping(row)
+            temp = self.dumping(row)
+            self.new_collection(i, temp)
 
 
-class order_execution(SQL):
+class ORDER_EXECUTION(MONGO):
 
     def execute(self):
         self.get_details()
         self.connect()
         self.listing_tables()
+        self.prerequesites()
         self.reading_tables()
-        print(self.data)
+
 
 if __name__ == '__main__':
-    obj = order_execution()
+    obj = ORDER_EXECUTION()
     obj.execute()
+    print('done importing')
