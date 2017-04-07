@@ -1,0 +1,6 @@
+pip install pymongo
+pip install sqlite3
+Install mongo db
+Run mongod
+Place the sqlite database in the script directory
+Run the script, when prompted for the database name, enter the name of database.
