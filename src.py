@@ -1,4 +1,3 @@
-import json
 import sqlite3
 import os
 import re
@@ -6,18 +5,7 @@ import sys
 import pymongo
 
 
-class JSON():
-
-    def dictionary(self, var1):
-        return [dict(i) for i in var1]
-
-    def dumping(self, var1):
-        var1 = self.dictionary(var1)
-        # return json.dumps(var1)
-        return var1
-
-
-class SQL(JSON):
+class SQL():
     conn = ''
     path = ''
     name_db = ''
@@ -70,6 +58,15 @@ class MONGO(SQL):
         self.client = pymongo.MongoClient()
         self.ns_db = self.client[self.name_db[:-3]]
 
+
+    def dictionary(self, var1):
+        return [dict(i) for i in var1]
+
+    def dumping(self, var1):
+        var1 = self.dictionary(var1)
+        # return json.dumps(var1)
+        return var1
+    
     def new_collection(self, table, data):
         coll = self.ns_db[table]
         coll.insert(data)
